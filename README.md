@@ -21,7 +21,7 @@ docs/      設計・開発ドキュメント
 - C++20に対応したコンパイラ
 - clang-format（C++ ソースの整形に使用）
 
-Vulkan SDKなどの依存関係は、必要になるモジュールを追加する段階で設定します。
+CMakeは GLFW 3.4、Dear ImGui 1.91.9b、spdlog 1.15.3 を `FetchContent` で取得するため、sandboxの初回構成時にネットワーク接続が必要です。sandboxのビルドと実行にはVulkan SDKが必要です。Validation Layersを有効にする場合は、Vulkan SDKにKhronos Validation Layerも含めてください。現在のsandboxはVulkan swapchainを使った画面クリアとDear ImGuiによる状態表示まで実装しています。詳細は [`app/sandbox/docs/README.md`](app/sandbox/docs/README.md) を参照してください。
 
 ## 構成とビルド
 
