@@ -1,4 +1,5 @@
 # エージェント向け指針
 
 - プロジェクトの構成・設計・ビルド方針は [`docs/development.md`](docs/development.md) を参照してください。
+- C++ を追加・変更するときは [`docs/cpp-style-guide.md`](docs/cpp-style-guide.md) のコーディング規約に従ってください。
 - 既存の変更を不用意に上書きせず、関連する設定やドキュメントも合わせて更新してください。

@@ -29,3 +29,15 @@ cmake --build --preset ninja
 
 - モジュール間の依存は必要最小限にし、物理計算とVulkan固有処理の責務を分けます。
 - 新しい依存ライブラリやツールを導入するときは、CMake設定とREADMEの必要環境・手順を合わせて更新します。
+
+## C++ コーディング規約
+
+C++ ソースの命名、書式、依存関係、安全性に関する規約は [`cpp-style-guide.md`](cpp-style-guide.md) を参照してください。
+
+C++ の書式整形には `clang-format` を使います。リポジトリルートから次を実行すると、C++ ファイルを整形できます。
+
+```sh
+clang-format -i path/to/file.cpp path/to/file.hpp
+```
+
+`.clang-format` の設定を変更した場合や `clang-format` を導入・更新する場合は、利用するバージョンで設定が認識されることを確認してください。
