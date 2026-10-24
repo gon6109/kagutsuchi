@@ -44,6 +44,8 @@ class VulkanContext
     void createSwapchain();
     void createImageViews();
     void createRenderPass();
+    void createGraphicsPipeline();
+    VkShaderModule createShaderModule(const std::vector<char>& code) const;
     void createFramebuffers();
     void createCommandPool();
     void createCommandBuffers();
@@ -71,6 +73,8 @@ class VulkanContext
     std::vector<VkImage> swapchainImages_;
     std::vector<VkImageView> swapchainImageViews_;
     VkRenderPass renderPass_ = VK_NULL_HANDLE;
+    VkPipelineLayout pipelineLayout_ = VK_NULL_HANDLE;
+    VkPipeline graphicsPipeline_ = VK_NULL_HANDLE;
     std::vector<VkFramebuffer> framebuffers_;
     VkCommandPool commandPool_ = VK_NULL_HANDLE;
     std::vector<VkCommandBuffer> commandBuffers_;

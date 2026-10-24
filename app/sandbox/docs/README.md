@@ -8,7 +8,7 @@
 2. [`roadmap.md`](roadmap.md) — 未着手・進行中の作業を確認します。
 3. [`decisions/`](decisions/) — 重要な設計判断の背景を確認します（記録がある場合）。
 
-現在、Vulkan の画面クリアと Dear ImGui による sandbox 状態表示まで実装済みです。シェーダー描画、操作 UI、物理シミュレーションの残作業は `roadmap.md` を参照してください。
+現在、GLSL をビルド時に SPIR-V へ変換して三色の三角形を描画し、Dear ImGui による sandbox 状態表示を行います。操作 UI、GLM による変換、物理シミュレーションの残作業は `roadmap.md` を参照してください。
 
 ## 更新ルール
 

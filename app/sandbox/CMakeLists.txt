@@ -32,6 +32,31 @@ endif()
 
 find_package(Vulkan REQUIRED)
 
+find_program(GLSLANG_VALIDATOR glslangValidator HINTS
+    "$ENV{VULKAN_SDK}/Bin"
+    "$ENV{VULKAN_SDK}/bin"
+    "C:/VulkanSDK/1.4.363.0/Bin"
+)
+if(NOT GLSLANG_VALIDATOR)
+    message(FATAL_ERROR "glslangValidator was not found. Install the Vulkan SDK or add it to PATH.")
+endif()
+
+set(SANDBOX_SHADER_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/shaders")
+set(SANDBOX_SHADER_OUTPUTS)
+foreach(SHADER triangle.vert triangle.frag)
+    set(SHADER_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/shaders/${SHADER}")
+    set(SHADER_OUTPUT "${SANDBOX_SHADER_OUTPUT_DIR}/${SHADER}.spv")
+    add_custom_command(
+        OUTPUT "${SHADER_OUTPUT}"
+        COMMAND "${CMAKE_COMMAND}" -E make_directory "${SANDBOX_SHADER_OUTPUT_DIR}"
+        COMMAND "${GLSLANG_VALIDATOR}" -V "${SHADER_SOURCE}" -o "${SHADER_OUTPUT}"
+        DEPENDS "${SHADER_SOURCE}"
+        VERBATIM
+    )
+    list(APPEND SANDBOX_SHADER_OUTPUTS "${SHADER_OUTPUT}")
+endforeach()
+add_custom_target(sandbox_shaders DEPENDS ${SANDBOX_SHADER_OUTPUTS})
+
 add_library(imgui_vulkan STATIC
     ${imgui_SOURCE_DIR}/imgui.cpp
     ${imgui_SOURCE_DIR}/imgui_draw.cpp
@@ -49,6 +74,8 @@ add_executable(sandbox
     src/main.cpp
     src/vulkan_context.cpp
 )
+add_dependencies(sandbox sandbox_shaders)
+target_compile_definitions(sandbox PRIVATE KAGUTSUCHI_SANDBOX_SHADER_DIR="${SANDBOX_SHADER_OUTPUT_DIR}")
 target_compile_features(sandbox PRIVATE cxx_std_20)
 target_link_libraries(sandbox PRIVATE glfw spdlog::spdlog Vulkan::Vulkan imgui_vulkan)
 if(KAGUTSUCHI_SANDBOX_VALIDATION_LAYERS)

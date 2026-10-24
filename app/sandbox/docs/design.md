@@ -12,8 +12,9 @@
 - マイルストーン2を実装済み。Vulkan instance、GLFW surface、swapchain 拡張を備え graphics/present queue に対応する device、swapchain、image view、clear 用 render pass/framebuffer、command buffer と描画同期を初期化する。フレームごとに暗い青色で画面をクリアして present する。
 - framebuffer サイズ変更後は device の処理完了を待って swapchain 依存リソースを再作成する。最小化中は framebuffer が 0 でなくなるまでイベント待機し、終了要求も確認する。
 - Dear ImGui の GLFW platform backend と Vulkan renderer backend を使い、Vulkan renderer、swapchain サイズ、image 数を状態パネルに表示する。ImGui の descriptor pool と backend は VulkanContext が所有する。
+- GLSL vertex/fragment shader を `glslangValidator` でビルド時に SPIR-V 化する。VulkanContext は swapchain の render pass に適合する graphics pipeline を作成し、頂点バッファなしの三頂点描画で色付き三角形を描く。
 - VS Code の sandbox 起動構成では作業ディレクトリを `build/app/sandbox/`（実行ファイルの配置先）にする。実行時ファイルはこの作業ディレクトリに生成される。
-- swapchain 再生成時は device idle 後に ImGui Vulkan backend を終了し、render pass と swapchain image 数を更新してから再初期化する。終了時は ImGui backend/context/descriptor pool を swapchain と device より先に破棄する。
+- swapchain 再生成時は device idle 後に ImGui backend と graphics pipeline/layout を終了し、render pass と swapchain image 数を更新してから pipeline と ImGui backend を再初期化する。終了時はそれらを swapchain と device より先に破棄する。shader module は pipeline 作成後に破棄し、SPIR-V ファイルだけを実行時に読む。
 - 開発用 Validation Layers は `KAGUTSUCHI_SANDBOX_VALIDATION_LAYERS=ON` で有効化する。要求した layer が Vulkan SDK にない場合は起動時にエラーとする。
 
 ## 初期構成
@@ -26,7 +27,7 @@
 - ログには spdlog を使う。
 - シェーダーは GLSL で記述し、ビルド時に `glslangValidator` で SPIR-V に変換する。
 
-GLFW、Dear ImGui、GLM、spdlog は CMake の `FetchContent` で取得する。取得するバージョンは CMake 設定で固定する。現在は GLFW 3.4、Dear ImGui 1.91.9b、spdlog 1.15.3 を取得する。GLM は後続の描画段階で追加する。Vulkan SDK は外部開発環境として導入し、Vulkan loader とヘッダーを利用する。
+GLFW、Dear ImGui、spdlog は CMake の `FetchContent` で取得する。取得するバージョンは CMake 設定で固定する。現在は GLFW 3.4、Dear ImGui 1.91.9b、spdlog 1.15.3 を取得する。GLM は後続の描画段階で追加する。Vulkan SDK は外部開発環境として導入し、Vulkan loader、ヘッダー、および `glslangValidator` を利用する。
 
 ## 責務の境界
 
@@ -39,7 +40,7 @@ GLFW、Dear ImGui、GLM、spdlog は CMake の `FetchContent` で取得する。
 
 Vulkan が受け取るシェーダー形式は SPIR-V とする。ソース GLSL を実行時に直接読み込むのではなく、CMake のカスタムコマンドで `.vert`、`.frag` などを SPIR-V に変換し、その出力をアプリケーションが読み込む。
 
-初期の描画機能は、ウィンドウの表示、Vulkan instance/device/surface/swapchain の作成、画面クリア、および Dear ImGui による sandbox 状態表示までを実装済み。Validation Layers は開発時に有効化できる。
+初期の描画機能は、ウィンドウの表示、Vulkan instance/device/surface/swapchain の作成、画面クリア、色付き三角形、および Dear ImGui による sandbox 状態表示までを実装済み。Validation Layers は開発時に有効化できる。
 
 ## 依存の配置とビルド成果物
 
@@ -66,7 +67,7 @@ app/
 
 1. GLFW のウィンドウを作成し、spdlog で起動・終了を記録する。（実装済み）
 2. Vulkan instance、device、surface、swapchain を初期化し、画面をクリアする。（実装済み）
-3. GLSL シェーダーをビルド時に SPIR-V 化して、簡単な図形を描画する。
+3. GLSL シェーダーをビルド時に SPIR-V 化して、簡単な図形を描画する。（三角形描画を実装済み）
 4. Dear ImGui の GLFW/Vulkan backend を接続し、sandbox の状態を表示する。（状態表示を実装済み。操作 UI は未実装）
 5. GLM を使った変換と、物理シミュレーションの小さな実験を表示する。
 
